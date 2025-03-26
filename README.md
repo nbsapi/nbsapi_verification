@@ -67,6 +67,19 @@ If the command completes sucessfully, you can run the verification tool:
 nbsapi_verify --config-dir ~
 ```
 
+You can also generate JSON and HTML reports of the test results:
+
+```shell
+# Generate default JSON report (nbsapi_verify_report.json)
+nbsapi_verify --config-dir ~ --json-output
+
+# Generate default HTML report (nbsapi_verify_report.html)
+nbsapi_verify --config-dir ~ --html-output
+
+# Generate both reports
+nbsapi_verify --config-dir ~ --json-output --html-output
+```
+
 When all tests pass, your API implementation is conformant to the `NbsAPI` specification!
 
 ## Help
