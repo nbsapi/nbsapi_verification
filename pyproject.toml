@@ -8,6 +8,7 @@ requires-python = ">=3.9"
 dependencies = [
     "click>=8.1.8",
     "tavern>=2.11.0",
+    "jinja2>=3.0.0",
 ]
 authors = [
     { name = "Stephan Hügel", email = "urschrei@gmail.com" },

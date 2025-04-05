@@ -1,5 +1,7 @@
 # ruff: noqa: UP007
 
+import json
+import os
 import sys
 from enum import Enum
 from pathlib import Path
@@ -9,7 +11,7 @@ import click
 import pytest
 import yaml
 
-from .formatting import ResultCapture, format_results
+from .formatting import ResultCapture, format_json, format_results, render_html
 
 
 class TestType(str, Enum):
@@ -94,6 +96,22 @@ def get_config_path(config_dir: Optional[str] = None) -> Path:
     default="all",
     help="Type of tests to run",
 )
+@click.option(
+    "--json-output",
+    type=click.Path(),
+    default=None,
+    is_flag=True,
+    flag_value="",
+    help="Output test results as JSON",
+)
+@click.option(
+    "--html-output",
+    type=click.Path(),
+    default=None,
+    is_flag=True,
+    flag_value="",
+    help="Output test results as HTML",
+)
 def cli(
     generate: bool,
     config_dir: Optional[str],
@@ -103,8 +121,10 @@ def cli(
     password: Optional[str],
     solution: int,
     test_type: str,
+    json_output: Optional[str],
+    html_output: Optional[str],
 ):
-    """Tavern test runner and configuration generator."""
+    """NbSAPI test runner and configuration generator."""
     if generate:
         if not host:
             click.echo("Error: --host is required when using --generate", err=True)
@@ -148,14 +168,16 @@ def cli(
                 err=True,
             )
             sys.exit(1)
-            
+
     # Load config to check available test types
     with open(config_path) as f:
         config = yaml.safe_load(f)
-        
+
     # Check for test type mismatch
-    has_auth_config = "username" in config.get("variables", {}) and "password" in config.get("variables", {})
-    
+    has_auth_config = "username" in config.get(
+        "variables", {}
+    ) and "password" in config.get("variables", {})
+
     # Detect test type mismatch
     if test_type in (TestType.AUTH, TestType.ALL) and not has_auth_config:
         click.echo(
@@ -176,14 +198,14 @@ def cli(
 
     # Verify that requested test types have matching test files
     import glob
-    
+
     # Get all test files and check for their markers
     test_files = glob.glob(str(test_dir / "*.tavern.yaml"))
-    
+
     # Check if there are any test files with requested markers
     has_auth_tests = False
     has_public_tests = False
-    
+
     for test_file in test_files:
         with open(test_file) as f:
             content = f.read()
@@ -191,7 +213,7 @@ def cli(
                 has_auth_tests = True
             if "marks:\n- public" in content:
                 has_public_tests = True
-    
+
     # Verify requested test type has matching test files
     if test_type == TestType.AUTH and not has_auth_tests:
         click.echo(
@@ -200,7 +222,7 @@ def cli(
             err=True,
         )
         sys.exit(1)
-    
+
     if test_type == TestType.PUBLIC and not has_public_tests:
         click.echo(
             f"Error: Test type '{test_type}' requested but no public test files found.\n"
@@ -208,7 +230,7 @@ def cli(
             err=True,
         )
         sys.exit(1)
-        
+
     if test_type == TestType.ALL and not (has_auth_tests and has_public_tests):
         missing = []
         if not has_auth_tests:
@@ -242,8 +264,42 @@ def cli(
     # Run pytest with capture
     exit_code = pytest.main(pytest_args, plugins=[capture])
 
-    # Print formatted results
+    # Print formatted results to terminal
     click.echo(format_results(capture))
+
+    # Handle JSON output if requested
+    if json_output is not None:
+        # Use config_dir if provided, otherwise use current directory
+        base_dir = os.path.curdir if not config_dir else config_dir
+
+        # If a path was explicitly provided, use it; otherwise use the default filename
+        if json_output and json_output != "":
+            json_path = json_output
+        else:
+            json_path = os.path.join(base_dir, "nbsapi_verify_report.json")
+
+        json_data = format_json(capture)
+        with open(json_path, "w") as f:
+            json.dump(json_data, f, indent=2)
+        click.echo(f"JSON report saved to: {json_path}")
+
+    # Handle HTML output if requested
+    if html_output is not None:
+        # Use config_dir if provided, otherwise use current directory
+        base_dir = os.path.curdir if not config_dir else config_dir
+
+        # If a path was explicitly provided, use it; otherwise use the default filename
+        if html_output and html_output != "":
+            html_path = html_output
+        else:
+            html_path = os.path.join(base_dir, "nbsapi_verify_report.html")
+
+        # Generate HTML using JSON data as input
+        json_data = format_json(capture) if not json_output else None
+        html_content = render_html(capture, json_data)
+        with open(html_path, "w") as f:
+            f.write(html_content)
+        click.echo(f"HTML report saved to: {html_path}")
 
     sys.exit(exit_code)
 

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NbSAPI Verification Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .summary {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .passed { color: green; }
+        .failed { color: red; }
+        .skipped { color: orange; }
+        .test-list {
+            margin-bottom: 20px;
+        }
+        .error-details {
+            background-color: #fff0f0;
+            padding: 10px;
+            border-left: 3px solid red;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+        .conformant {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .non-conformant {
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1><a href="https://nbsapi.org">NbSAPI</a> Conformance Report</h1>
+    
+    <div class="summary">
+        <h2>Summary</h2>
+        <p><strong>Total tests:</strong> {{ data.summary.total }}</p>
+        <p class="passed"><strong>Passed:</strong> {{ data.summary.passed }}</p>
+        <p class="failed"><strong>Failed:</strong> {{ data.summary.failed }}</p>
+        <p class="skipped"><strong>Skipped:</strong> {{ data.summary.skipped }}</p>
+        <p><strong>Duration:</strong> {{ data.summary.duration }}s</p>
+        <p><strong>Timestamp:</strong> {{ data.summary.timestamp }}</p>
+    </div>
+    
+    {% if data.is_conformant %}
+    <div class="conformant">
+        <h2>✅ Conformant</h2>
+        <p>Congratulations, your NbSAPI implementation is conformant!</p>
+    </div>
+    {% else %}
+    <div class="non-conformant">
+        <h2>❌ Non-Conformant</h2>
+        <p>Your NbSAPI implementation has some test failures. Please fix them to be conformant!</p>
+    </div>
+    {% endif %}
+    
+    {% if data.tests.failed %}
+    <div class="test-list">
+        <h2 class="failed">Failed Tests</h2>
+        <ul>
+            {% for test in data.tests.failed %}
+            <li>
+                <strong>{{ test.id }}</strong>
+                <div class="error-details">{{ test.error }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    {% if data.tests.passed %}
+    <div class="test-list">
+        <h2 class="passed">Passed Tests</h2>
+        <ul>
+            {% for test in data.tests.passed %}
+            <li>{{ test }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    {% if data.tests.skipped %}
+    <div class="test-list">
+        <h2 class="skipped">Skipped Tests</h2>
+        <ul>
+            {% for test in data.tests.skipped %}
+            <li>{{ test }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</body>
+</html>
