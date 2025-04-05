@@ -1,6 +1,6 @@
 [project]
 name = "nbsapi_verify"
-version = "0.1.6"
+version = "0.1.7"
 description = "Verify an nbsinfra API implementation"
 readme = "README.md"
 license = {text = "MIT License"}
