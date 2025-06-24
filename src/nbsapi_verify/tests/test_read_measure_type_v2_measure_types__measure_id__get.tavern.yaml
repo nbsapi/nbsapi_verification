@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Read Measure Type
+  request:
+    method: GET
+    url: '{host}/v2/measure_types/{measure_id}'
+  response:
+    status_code: 200
+test_name: read_measure_type_v2_measure_types__measure_id__get

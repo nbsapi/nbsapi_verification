@@ -1,0 +1,98 @@
+marks:
+- auth
+stages:
+- name: Get auth token
+  request:
+    data:
+      password: '{password}'
+      username: '{username}'
+    method: POST
+    url: '{host}/auth/token'
+  response:
+    save:
+      json:
+        token: access_token
+    status_code: 200
+- name: Create a project
+  request:
+    headers:
+      Authorization: Bearer {token}
+    json:
+      areas:
+      - 1
+      - 2
+      - 3
+      description: Urban nature-based solutions implementation
+      map:
+        base_layer: OpenStreetMap
+        center:
+        - 23.71841890133385
+        - 38.00910725441946
+        zoom: 16
+      settings:
+        capacity:
+          droughtCoping: true
+          floodCoping: true
+          heatCoping: true
+          waterSafetyCoping: false
+        multifunctionality: '1'
+        scale:
+          building: true
+          city: false
+          neighbourhood: true
+          street: true
+        scenario_name: Athens_area_5_Medium_density_mixed_use
+        slope: flatAreaHighGround
+        soil: sand
+        subsurface: high
+        suitability:
+          blueSpace: false
+          greenSpaceNoRecreation: true
+          greenSpacePrivateGardens: true
+          greenSpaceRecreationUrbanFarming: false
+          greyGreenSpaceSportsPlayground: true
+          greySpace: true
+          redSpace: true
+        surface: flatRoofs
+      targets:
+        climate:
+          cool_spot:
+            include: true
+            value: '0'
+          evapotranspiration:
+            include: true
+            value: '0'
+          groundwater_recharge:
+            include: true
+            value: '0'
+          storage_capacity:
+            include: true
+            value: '1400'
+          temp_reduction:
+            include: true
+            value: '0'
+        cost:
+          construction_cost:
+            include: true
+            value: '0'
+          maintenance_cost:
+            include: true
+            value: '0'
+        water_quality:
+          capture_unit:
+            include: true
+            value: '100'
+          filtering_unit:
+            include: true
+            value: '100'
+          settling_unit:
+            include: true
+            value: '100'
+      title: Votris project area
+    method: POST
+    url: '{host}/v2/api/projects?project_id=1'
+  response:
+    status_code:
+    - 200
+    - 409
+test_name: create_new_project_v2_api_projects_post

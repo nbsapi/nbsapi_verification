@@ -1,0 +1,27 @@
+marks:
+- auth
+stages:
+- name: Get auth token
+  request:
+    data:
+      password: '{password}'
+      username: '{username}'
+    method: POST
+    url: '{host}/auth/token'
+  response:
+    save:
+      json:
+        token: access_token
+    status_code: 200
+- name: Update Existing Measure Type
+  request:
+    headers:
+      Authorization: Bearer {token}
+    json: {}
+    method: PATCH
+    url: '{host}/v2/measure_types/{measure_id}'
+  response:
+    status_code:
+    - 200
+    - 409
+test_name: update_existing_measure_type_v2_measure_types__measure_id__patch

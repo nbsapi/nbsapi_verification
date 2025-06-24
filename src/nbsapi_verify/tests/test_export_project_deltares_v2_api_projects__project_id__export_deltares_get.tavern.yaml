@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Export a project in Deltares format
+  request:
+    method: GET
+    url: '{host}/v2/api/projects/{project_id}/export/deltares'
+  response:
+    status_code: 200
+test_name: export_project_deltares_v2_api_projects__project_id__export_deltares_get

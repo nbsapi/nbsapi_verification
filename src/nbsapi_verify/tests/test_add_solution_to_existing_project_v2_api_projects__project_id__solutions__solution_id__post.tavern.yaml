@@ -13,16 +13,14 @@ stages:
       json:
         token: access_token
     status_code: 200
-- name: Write Target
+- name: Add solution to project
   request:
     headers:
       Authorization: Bearer {token}
-    json:
-      type: Pluvial flooding
     method: POST
-    url: '{host}/v1/api/adaptation_targets/adaptation_target'
+    url: '{host}/v2/api/projects/{project_id}/solutions/{solution_id}'
   response:
     status_code:
     - 200
     - 409
-test_name: write_target_v1_api_adaptation_targets_adaptation_target_post
+test_name: add_solution_to_existing_project_v2_api_projects__project_id__solutions__solution_id__post

@@ -1,5 +1,4 @@
-# ruff: noqa: UP007
-
+import glob
 import json
 import os
 import sys
@@ -91,6 +90,24 @@ def get_config_path(config_dir: Optional[str] = None) -> Path:
     help="Existing test solution ID (defaults to 1)",
 )
 @click.option(
+    "--project",
+    type=int,
+    default=1,
+    help="Existing test project ID (defaults to 1)",
+)
+@click.option(
+    "--impact",
+    type=int,
+    default=1,
+    help="Existing test impact ID (defaults to 1)",
+)
+@click.option(
+    "--measure",
+    type=int,
+    default=1,
+    help="Existing test measure ID (defaults to 1)",
+)
+@click.option(
     "--test-type",
     type=click.Choice(["all", "auth", "public"]),
     default="all",
@@ -120,6 +137,9 @@ def cli(
     username: Optional[str],
     password: Optional[str],
     solution: int,
+    project: int,
+    impact: int,
+    measure: int,
     test_type: str,
     json_output: Optional[str],
     html_output: Optional[str],
@@ -136,6 +156,9 @@ def cli(
         config = {"variables": {"host": host}}
         config["variables"].update({"user_id": testid})
         config["variables"].update({"solution_id": solution})
+        config["variables"].update({"project_id": project})
+        config["variables"].update({"impact_id": impact})
+        config["variables"].update({"measure_id": measure})
 
         if username and password:
             config["variables"].update({"username": username, "password": password})
@@ -197,7 +220,6 @@ def cli(
         sys.exit(1)
 
     # Verify that requested test types have matching test files
-    import glob
 
     # Get all test files and check for their markers
     test_files = glob.glob(str(test_dir / "*.tavern.yaml"))
@@ -261,11 +283,30 @@ def cli(
     # Create result capture
     capture = ResultCapture()
 
+    # Set environment variable to allow project ID override for testing
+    os.environ["ALLOW_PROJECT_ID_OVERRIDE"] = "true"
+
     # Run pytest with capture
     exit_code = pytest.main(pytest_args, plugins=[capture])
 
     # Print formatted results to terminal
     click.echo(format_results(capture))
+
+    # Always show DELETE operations note
+    delete_message = (
+        f"\n{'=' * 60}\n"
+        "ℹ️  NOTE: DELETE endpoint tests are intentionally excluded\n"  # noqa: RUF001
+        f"{'=' * 60}\n"
+        "DELETE operations are not included in conformance tests to prevent\n"
+        "data destruction when running against production databases.\n"
+        "\n"
+        "If you need to test DELETE operations, please:\n"
+        "1. Use an isolated test environment\n"
+        "2. Create custom tests specifically for DELETE operations\n"
+        "3. Ensure proper data cleanup and restoration procedures\n"
+        f"{'=' * 60}"
+    )
+    click.echo(delete_message)
 
     # Handle JSON output if requested
     if json_output is not None:

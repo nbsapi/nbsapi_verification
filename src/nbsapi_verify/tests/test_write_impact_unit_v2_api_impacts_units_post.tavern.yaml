@@ -1,0 +1,29 @@
+marks:
+- auth
+stages:
+- name: Get auth token
+  request:
+    data:
+      password: '{password}'
+      username: '{username}'
+    method: POST
+    url: '{host}/auth/token'
+  response:
+    save:
+      json:
+        token: access_token
+    status_code: 200
+- name: Write Impact Unit
+  request:
+    headers:
+      Authorization: Bearer {token}
+    json:
+      description: shade
+      unit: m2
+    method: POST
+    url: '{host}/v2/api/impacts/units'
+  response:
+    status_code:
+    - 200
+    - 409
+test_name: write_impact_unit_v2_api_impacts_units_post

@@ -13,14 +13,17 @@ stages:
       json:
         token: access_token
     status_code: 200
-- name: User Details
+- name: Import a project
   request:
     headers:
       Authorization: Bearer {token}
-    method: GET
-    url: '{host}/v1/api/users/{user_id}'
+    json:
+      id: proj-123
+      title: Urban Heat Island Mitigation Plan
+    method: POST
+    url: '{host}/v2/api/projects/import'
   response:
     status_code:
     - 200
     - 409
-test_name: user_details_v1_api_users__user_id__get
+test_name: import_project_v2_api_projects_import_post

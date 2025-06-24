@@ -1,9 +1,11 @@
 import datetime as dt
 import os
+import re
 from datetime import datetime
 from typing import Any, Optional
 
 from _pytest.reports import TestReport
+from jinja2 import Template
 
 
 class ResultCapture:
@@ -17,21 +19,21 @@ class ResultCapture:
     def pytest_runtest_logreport(self, report: TestReport):
         if report.when == "call":  # Only process the test result, not setup/teardown
             test_id = report.nodeid
-            
+
             # Extract endpoint from test_id
             # Format is typically: path/to/test_name_endpoint.tavern.yaml::test_name
             # We want to extract the endpoint part (/contact, /v1/api/users, etc.)
-            import re
-            endpoint_match = re.search(r'test_.+?_(.+?)\.tavern\.yaml', test_id)
+
+            endpoint_match = re.search(r"test_.+?_(.+?)\.tavern\.yaml", test_id)
             if endpoint_match:
                 # Replace underscores with slashes to reconstruct the API endpoint
-                endpoint = endpoint_match.group(1).replace('_', '/')
+                endpoint = endpoint_match.group(1).replace("_", "/")
                 # Add leading slash for clarity
                 endpoint = f"/{endpoint}"
             else:
                 # Fallback to original test_id if pattern not found
                 endpoint = test_id
-            
+
             if report.passed:
                 self.passed.append(endpoint)
             elif report.failed:
@@ -79,16 +81,14 @@ def format_results(capture: ResultCapture) -> str:
             output.append(f"❌ {test['id']}")
             # Format error message with proper indentation
             error_lines = test["error"].split("\n")
-            for line in error_lines:
-                output.append(f"    {line}")
+            output.extend(f"    {line}" for line in error_lines)
             output.append("")  # Empty line between failures
 
     # If there were skips, list them briefly
     if capture.skipped:
         output.append("\nSkipped Tests")
         output.append("-" * 40)
-        for test in capture.skipped:
-            output.append(f"⏭️  {test}")
+        output.extend(f"⏭️  {test}" for test in capture.skipped)
     if not failures:
         output.append(
             "\n✨ Congratulations, your NbSAPI implementation is conformant! ✨"
@@ -116,6 +116,15 @@ def format_json(capture: ResultCapture) -> dict[str, Any]:
             "skipped": [test_id for test_id in capture.skipped],
         },
         "is_conformant": len(capture.failed) == 0,
+        "delete_note": {
+            "title": "DELETE endpoint tests are intentionally excluded",
+            "message": "DELETE operations are not included in conformance tests to prevent data destruction when running against production databases.",
+            "recommendations": [
+                "Use an isolated test environment",
+                "Create custom tests specifically for DELETE operations",
+                "Ensure proper data cleanup and restoration procedures",
+            ],
+        },
     }
 
 
@@ -123,7 +132,6 @@ def render_html(
     capture: ResultCapture, json_data: Optional[dict[str, Any]] = None
 ) -> str:
     """Render test results as HTML using a Jinja2 template."""
-    from jinja2 import Template
 
     # Use the JSON data if provided, otherwise generate it
     data = json_data if json_data is not None else format_json(capture)

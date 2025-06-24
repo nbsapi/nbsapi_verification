@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Get a nature-based solution as GeoJSON Feature
+  request:
+    method: GET
+    url: '{host}/v2/api/solutions/solutions/{solution_id}/geojson'
+  response:
+    status_code: 200
+test_name: read_nature_based_solution_as_geojson_v2_api_solutions_solutions__solution_id__geojson_get

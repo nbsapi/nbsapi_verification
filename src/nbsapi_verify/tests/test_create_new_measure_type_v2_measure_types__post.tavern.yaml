@@ -13,20 +13,17 @@ stages:
       json:
         token: access_token
     status_code: 200
-- name: Write Nature Based Solution
+- name: Create New Measure Type
   request:
     headers:
       Authorization: Bearer {token}
     json:
-      cobenefits: Improved biodiversity
-      definition: Definition of the solution
-      location: Coastal Area X
-      name: Coastal Restoration
-      specificdetails: Detailed information
+      id: '39'
+      name: Green Roof
     method: POST
-    url: '{host}/v1/api/solutions/add_solution/'
+    url: '{host}/v2/measure_types/'
   response:
     status_code:
     - 200
     - 409
-test_name: write_nature_based_solution_v1_api_solutions_add_solution__post
+test_name: create_new_measure_type_v2_measure_types__post

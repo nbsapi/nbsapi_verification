@@ -1,0 +1,11 @@
+marks:
+- public
+stages:
+- name: Find nature-based solutions
+  request:
+    json: {}
+    method: POST
+    url: '{host}/v2/api/solutions/solutions'
+  response:
+    status_code: 200
+test_name: get_solutions_v2_api_solutions_solutions_post

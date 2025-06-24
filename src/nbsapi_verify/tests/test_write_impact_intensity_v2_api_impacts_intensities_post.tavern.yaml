@@ -13,20 +13,16 @@ stages:
       json:
         token: access_token
     status_code: 200
-- name: Write User
+- name: Write Impact Intensity
   request:
     headers:
       Authorization: Bearer {token}
     json:
-      email: user4277@domain.com
-      first_name: Jane
-      last_name: Doe
-      password: nbsapi8415
-      username: nbsapi_user_4197
+      intensity: low
     method: POST
-    url: '{host}/v1/api/users/user'
+    url: '{host}/v2/api/impacts/intensities'
   response:
     status_code:
     - 200
     - 409
-test_name: write_user_v1_api_users_user_post
+test_name: write_impact_intensity_v2_api_impacts_intensities_post

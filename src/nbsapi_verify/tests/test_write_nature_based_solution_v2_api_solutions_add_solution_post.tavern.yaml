@@ -1,0 +1,65 @@
+marks:
+- auth
+stages:
+- name: Get auth token
+  request:
+    data:
+      password: '{password}'
+      username: '{username}'
+    method: POST
+    url: '{host}/auth/token'
+  response:
+    save:
+      json:
+        token: access_token
+    status_code: 200
+- name: Create a new nature-based solution
+  request:
+    headers:
+      Authorization: Bearer {token}
+    json:
+      area: 3672.3235347681
+      cobenefits: Various environmental benefits
+      definition: Imported from Deltares format
+      geometry:
+        coordinates:
+        - - - 23.717992514920383
+            - 38.00993916350677
+          - - 23.71835238960557
+            - 38.00987732368668
+          - - 23.718232201749544
+            - 38.009469169435704
+          - - 23.718133541363812
+            - 38.00911729628717
+          - - 23.717763276983078
+            - 38.009161267544044
+          - - 23.717992514920383
+            - 38.00993916350677
+        type: Polygon
+      impacts:
+      - intensity:
+          intensity: medium
+        magnitude: 10.0
+        unit:
+          description: area
+          unit: m2
+      location: Imported location
+      measure_id: '39'
+      name: Area-1
+      physical_properties:
+        area_depth: 0.05
+        default_depth: 0.05
+        default_inflow: 1
+        default_radius: 1
+        default_width: 5
+      specificdetails: Details from Deltares import
+      styling:
+        color: '#cfdd20'
+        hidden: false
+    method: POST
+    url: '{host}/v2/api/solutions/add_solution'
+  response:
+    status_code:
+    - 200
+    - 409
+test_name: write_nature_based_solution_v2_api_solutions_add_solution_post

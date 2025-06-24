@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Get a nature-based solution
+  request:
+    method: GET
+    url: '{host}/v2/api/solutions/solutions/{solution_id}'
+  response:
+    status_code: 200
+test_name: read_nature_based_solution_v2_api_solutions_solutions__solution_id__get

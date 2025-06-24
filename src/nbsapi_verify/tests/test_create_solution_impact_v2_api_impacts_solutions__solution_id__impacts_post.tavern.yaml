@@ -1,0 +1,40 @@
+marks:
+- auth
+stages:
+- name: Get auth token
+  request:
+    data:
+      password: '{password}'
+      username: '{username}'
+    method: POST
+    url: '{host}/auth/token'
+  response:
+    save:
+      json:
+        token: access_token
+    status_code: 200
+- name: Create Solution Impact
+  request:
+    headers:
+      Authorization: Bearer {token}
+    json:
+      intensity:
+        intensity: high
+      magnitude: 142.33955129172907
+      specialized:
+        climate:
+          cool_spot: 0
+          evapotranspiration: 0.04105408115726775
+          groundwater_recharge: -0.04348092339316535
+          storage_capacity: 142.33955129172907
+          temp_reduction: 0.05763750310256802
+      unit:
+        description: storage capacity
+        unit: m3
+    method: POST
+    url: '{host}/v2/api/impacts/solutions/{solution_id}/impacts'
+  response:
+    status_code:
+    - 200
+    - 409
+test_name: create_solution_impact_v2_api_impacts_solutions__solution_id__impacts_post

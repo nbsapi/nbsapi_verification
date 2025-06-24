@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Export a project
+  request:
+    method: GET
+    url: '{host}/v2/api/projects/{project_id}/export'
+  response:
+    status_code: 200
+test_name: export_project_v2_api_projects__project_id__export_get

@@ -13,16 +13,15 @@ stages:
       json:
         token: access_token
     status_code: 200
-- name: Write Impact Intensity
+- name: Update a project
   request:
     headers:
       Authorization: Bearer {token}
-    json:
-      intensity: low
-    method: POST
-    url: '{host}/v1/api/impacts/impact_intensities'
+    json: {}
+    method: PATCH
+    url: '{host}/v2/api/projects/{project_id}'
   response:
     status_code:
     - 200
     - 409
-test_name: write_impact_intensity_v1_api_impacts_impact_intensities_post
+test_name: update_existing_project_v2_api_projects__project_id__patch

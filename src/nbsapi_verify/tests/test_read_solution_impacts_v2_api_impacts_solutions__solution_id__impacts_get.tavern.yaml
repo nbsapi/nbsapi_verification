@@ -1,0 +1,10 @@
+marks:
+- public
+stages:
+- name: Get solution impacts
+  request:
+    method: GET
+    url: '{host}/v2/api/impacts/solutions/{solution_id}/impacts'
+  response:
+    status_code: 200
+test_name: read_solution_impacts_v2_api_impacts_solutions__solution_id__impacts_get
